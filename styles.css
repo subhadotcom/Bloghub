@@ -114,6 +114,29 @@ main {
   background: #4da6ff;
   color: #1a1a1a;
 }
+
+.modern-back-btn {
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 0.7rem 1.5rem;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  background: linear-gradient(90deg, #232526 0%, #414345 100%);
+  color: #e0e0e0;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  gap: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.modern-back-btn:hover {
+  background: linear-gradient(90deg, #4da6ff 0%, #0077ff 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(77,166,255,0.18);
+}
 @media (max-width: 1800px) {
   .post-grid {
     grid-template-columns: repeat(3, 400px);
