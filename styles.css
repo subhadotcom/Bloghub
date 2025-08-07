@@ -1,16 +1,16 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: #fafbfc;
-  color: #222;
+  background: #1a1a1a;
+  color: #e0e0e0;
 }
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 2rem 4vw 1rem 4vw;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  background: #2d2d2d;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 header h1 {
   margin: 0;
@@ -20,7 +20,7 @@ header h1 {
 nav a {
   margin-left: 2rem;
   text-decoration: none;
-  color: #222;
+  color: #e0e0e0;
   font-weight: 500;
   transition: color 0.2s;
 }
@@ -30,45 +30,47 @@ nav a:hover {
 main {
   padding: 2rem 4vw;
 }
-.grid-container {
+.post-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(4, 400px);
   gap: 2rem;
   padding: 1rem;
+  justify-content: center;
 }
 .post-card {
-  background: #fff;
+  background: #2d2d2d;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   transition: box-shadow 0.2s, color 0.2s;
   text-decoration: none;
   color: inherit;
-  min-height: 250px;
-  max-width: 350px;
-  height: 100%;
+  width: 350px;
+  height: 200px;
+  border: 1px solid #404040;
 }
 .post-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  color: #0077ff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  color: #4da6ff;
+  border-color: #4da6ff;
 }
 .post-title {
   font-size: 1.3rem;
   margin: 0 0 0.5rem 0;
 }
 .post-title a {
-  color: #222;
+  color: #e0e0e0;
   text-decoration: none;
   transition: color 0.2s;
 }
 .post-title a:hover {
-  color: #0077ff;
+  color: #4da6ff;
 }
 .post-meta {
   font-size: 0.9rem;
-  color: #888;
+  color: #a0a0a0;
   margin-bottom: 1rem;
 }
 .post-content {
@@ -83,30 +85,50 @@ main {
   justify-content: flex-end;
 }
 .share-btn {
-  background: #f6f8fa;
+  background: #404040;
   border: none;
   border-radius: 6px;
   padding: 0.5rem 1rem;
   cursor: pointer;
   font-size: 1rem;
   text-decoration: none;
-  color: #222;
+  color: #e0e0e0;
   transition: background 0.2s, color 0.2s;
   display: inline-block;
 }
 .share-btn:hover {
-  background: #0077ff;
-  color: #fff;
+  background: #4da6ff;
+  color: #1a1a1a;
 }
+@media (max-width: 1800px) {
+  .post-grid {
+    grid-template-columns: repeat(3, 400px);
+  }
+}
+
+@media (max-width: 1400px) {
+  .post-grid {
+    grid-template-columns: repeat(2, 400px);
+  }
+}
+
+@media (max-width: 900px) {
+  .post-grid {
+    grid-template-columns: repeat(1, 400px);
+  }
+}
+
 @media (max-width: 600px) {
   header, main {
     padding-left: 2vw;
     padding-right: 2vw;
   }
-  .grid-container {
+  .post-grid {
     gap: 1rem;
   }
   .post-card {
     padding: 1rem;
+    width: 350px;
+    height: 350px;
   }
 } 
