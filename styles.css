@@ -1,0 +1,238 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #fafbfc;
+  color: #222;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 4vw 1rem 4vw;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+header h1 {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: 2px;
+}
+nav a {
+  margin-left: 2rem;
+  text-decoration: none;
+  color: #222;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+nav a:hover {
+  color: #0077ff;
+}
+main {
+  padding: 2rem 4vw;
+}
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+.post-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s;
+}
+.post-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.post-title {
+  font-size: 1.3rem;
+  margin: 0 0 0.5rem 0;
+}
+.post-meta {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 1rem;
+}
+.post-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.7rem;
+}
+.post-actions button {
+  background: #f6f8fa;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+}
+.post-actions .edit-btn:hover {
+  background: #0077ff;
+  color: #fff;
+}
+.post-actions .delete-btn:hover {
+  background: #ff3b3b;
+  color: #fff;
+}
+/* Editor styles */
+.editor-form {
+  max-width: 600px;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 2rem;
+}
+.editor-title {
+  font-size: 1.2rem;
+  padding: 0.7rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+.editor-textarea {
+  min-height: 180px;
+  font-size: 1rem;
+  padding: 0.7rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  font-family: inherit;
+  resize: vertical;
+}
+#image-upload {
+  margin-top: 0.5rem;
+}
+#image-preview img {
+  margin-top: 0.5rem;
+  border-radius: 6px;
+  max-width: 100%;
+  max-height: 200px;
+}
+.editor-save-btn {
+  background: #0077ff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.editor-save-btn:hover {
+  background: #005fcc;
+}
+.markdown-preview {
+  margin-top: 2rem;
+  background: #f6f8fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  min-height: 100px;
+  font-size: 1rem;
+  color: #222;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* Post page styles */
+#post-content-container {
+  max-width: 700px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 2rem;
+}
+.social-share {
+  max-width: 700px;
+  margin: 1rem auto 0 auto;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+.social-share button {
+  background: #f6f8fa;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+.social-share button:hover {
+  background: #0077ff;
+  color: #fff;
+}
+.comments-section {
+  max-width: 700px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 2rem;
+}
+#comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-bottom: 1.5rem;
+}
+#comment-form input, #comment-form textarea {
+  font-size: 1rem;
+  padding: 0.6rem;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+#comment-form button {
+  align-self: flex-end;
+  background: #0077ff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#comment-form button:hover {
+  background: #005fcc;
+}
+#comments-list {
+  margin-top: 1rem;
+}
+.comment {
+  border-bottom: 1px solid #eee;
+  padding: 0.7rem 0;
+}
+.comment:last-child {
+  border-bottom: none;
+}
+.comment-author {
+  font-weight: bold;
+  color: #0077ff;
+}
+.comment-date {
+  font-size: 0.9rem;
+  color: #888;
+  margin-left: 0.5rem;
+}
+.comment-text {
+  margin: 0.3rem 0 0 0;
+}
+@media (max-width: 600px) {
+  header, main {
+    padding-left: 2vw;
+    padding-right: 2vw;
+  }
+  .grid-container {
+    gap: 1rem;
+  }
+  .post-card {
+    padding: 1rem;
+  }
+} 

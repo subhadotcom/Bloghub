@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Post - Bloghub</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>New Post</h1>
+    <nav>
+      <a href="index.html">Home</a>
+    </nav>
+  </header>
+  <main>
+    <form id="post-form" class="editor-form">
+      <input type="text" id="post-title" placeholder="Post Title" required class="editor-title">
+      <textarea id="post-content" placeholder="Write your post in markdown..." required class="editor-textarea"></textarea>
+      <input type="file" id="image-upload" accept="image/*">
+      <div id="image-preview"></div>
+      <button type="submit" class="editor-save-btn">Save Post</button>
+    </form>
+    <section id="markdown-preview" class="markdown-preview"></section>
+  </main>
+  <script src="editor.js"></script>
+</body>
+</html> 
