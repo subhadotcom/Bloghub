@@ -1084,6 +1084,7 @@ main {
       #searchInput {
           position: fixed;
           right: 10px;
+          max-width: 150px;
           font-size: 16px;
           padding: 14px 16px;
       }
