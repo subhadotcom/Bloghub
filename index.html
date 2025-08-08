@@ -9,7 +9,11 @@
 <body>
   <header>
     <h1>Bloghub</h1>
-  </header>
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search posts...">
+        <div id="searchResults" class="search-results"></div>
+    </div>
+</header>
   <main>
     <main class="posts-container">
         <div class="post-grid">
@@ -23,10 +27,96 @@
                     </div>
                 </div>
             </a>
-
+            <a href="A_watch_that_rewinds.html" class="post-card">
+                <div class="post-content">
+                    <h2>A watch that rewinds</h2>
+                    <p>When the last leaf of an ancient tree fell, time in the city came to a halt. An old woman’s forgotten lullaby revived the tree, restoring the flow of time with a single new leaf.</p>
+                    <div class="post-meta">
+                        <span>August 7, 2025</span>
+                        <span>by Subha</span>
+                    </div>
+                </div>
+            </a>
+            <a href="A_man_wakes_up_in_a_city.html" class="post-card">
+                <div class="post-content">
+                    <h2>A man wakes up in a city</h2>
+                    <p>When the last leaf of an ancient tree fell, time in the city came to a halt. An old woman’s forgotten lullaby revived the tree, restoring the flow of time with a single new leaf.</p>
+                    <div class="post-meta">
+                        <span>August 7, 2025</span>
+                        <span>by Subha</span>
+                    </div>
+                </div>
+            </a>
+            <a href="Every_mirror_in_town.html" class="post-card">
+                <div class="post-content">
+                    <h2>Every mirror in town</h2>
+                    <p>When the last leaf of an ancient tree fell, time in the city came to a halt. An old woman’s forgotten lullaby revived the tree, restoring the flow of time with a single new leaf.</p>
+                    <div class="post-meta">
+                        <span>August 7, 2025</span>
+                        <span>by Subha</span>
+                    </div>
+                </div>
+            </a>
         </div>
         
     </main>
   </main>
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const posts = document.querySelectorAll('.post-card');
+
+        // Create an array of post data
+        const postData = Array.from(posts).map(post => ({
+            title: post.querySelector('h2').textContent,
+            content: post.querySelector('p').textContent,
+            link: post.getAttribute('href')
+        }));
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            if (searchTerm.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            const matches = postData.filter(post =>
+                post.title.toLowerCase().includes(searchTerm) ||
+                post.content.toLowerCase().includes(searchTerm)
+            );
+
+            if (matches.length > 0) {
+                searchResults.innerHTML = matches.map(post => `
+                    <div class="search-result-item" onclick="window.location.href='${post.link}'">
+                        <h3>${highlightMatch(post.title, searchTerm)}</h3>
+                        <p>${truncateAndHighlight(post.content, searchTerm)}</p>
+                    </div>
+                `).join('');
+                searchResults.style.display = 'block';
+            } else {
+                searchResults.innerHTML = '<div class="search-result-item">No results found</div>';
+                searchResults.style.display = 'block';
+            }
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchResults.contains(e.target) && e.target !== searchInput) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        function highlightMatch(text, searchTerm) {
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            return text.replace(regex, '<mark>$1</mark>');
+        }
+
+        function truncateAndHighlight(text, searchTerm, maxLength = 100) {
+            let truncated = text.length > maxLength ? 
+                text.substr(0, maxLength) + '...' : 
+                text;
+            return highlightMatch(truncated, searchTerm);
+        }
+    </script>
 </body>
 </html>
