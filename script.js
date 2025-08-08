@@ -293,40 +293,6 @@ function showCopyNotification() {
     }, 2000);
 }
 
-function toggleBookmark() {
-    const button = document.querySelector('.bookmark-btn');
-    const isBookmarked = button.classList.contains('bookmarked');
-    
-    if (isBookmarked) {
-        button.classList.remove('bookmarked');
-        button.textContent = 'Bookmark';
-        removeFromBookmarks();
-    } else {
-        button.classList.add('bookmarked');
-        button.textContent = 'Bookmarked ✓';
-        addToBookmarks();
-    }
-}
-
-function addToBookmarks() {
-    const currentUrl = window.location.href;
-    const currentTitle = document.querySelector('.post-info h2')?.textContent || 'Blog Post';
-    
-    let bookmarks = JSON.parse(localStorage.getItem('blogBookmarks') || '[]');
-    bookmarks.push({
-        url: currentUrl,
-        title: currentTitle,
-        date: new Date().toISOString()
-    });
-    localStorage.setItem('blogBookmarks', JSON.stringify(bookmarks));
-}
-
-function removeFromBookmarks() {
-    const currentUrl = window.location.href;
-    let bookmarks = JSON.parse(localStorage.getItem('blogBookmarks') || '[]');
-    bookmarks = bookmarks.filter(bookmark => bookmark.url !== currentUrl);
-    localStorage.setItem('blogBookmarks', JSON.stringify(bookmarks));
-}
 
 // Event listeners
 searchInput.addEventListener('input', (e) => {
