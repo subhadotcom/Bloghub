@@ -1,118 +1,178 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const searchResults = document.getElementById('searchResults');
-    let posts = [];
-    let searchTimeout;
+// DOM elements
+const searchInput = document.getElementById('searchInput');
+const searchButton = document.getElementById('searchButton');
+const searchResults = document.getElementById('searchResults');
 
-    // Fetch all posts from the page
-    function fetchPosts() {
-        const postCards = document.querySelectorAll('.post-card');
-        posts = Array.from(postCards).map(card => ({
-            title: card.querySelector('h2').textContent.trim(),
-            excerpt: card.querySelector('p').textContent.trim(),
-            url: card.getAttribute('href'),
-            element: card
-        }));
-    }
-
-    // Debounce search function
-    function debounceSearch(query) {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            searchPosts(query);
-        }, 200);
-    }
-
-    // Search function
-    function searchPosts(query) {
-        const searchTerm = query.trim().toLowerCase();
+// Function to get posts from the actual page
+function getPostsFromPage() {
+    const postCards = document.querySelectorAll('.post-card');
+    const posts = [];
+    
+    postCards.forEach(card => {
+        const titleElement = card.querySelector('h2');
+        const contentElement = card.querySelector('p');
+        const metaElement = card.querySelector('.post-meta');
         
-        if (!searchTerm) {
-            hideResults();
-            return;
-        }
-
-        const filteredPosts = posts.filter(post => 
-            post.title.toLowerCase().includes(searchTerm) || 
-            post.excerpt.toLowerCase().includes(searchTerm)
-        );
-
-        displayResults(filteredPosts);
-    }
-
-    // Display search results with animation
-    function displayResults(results) {
-        searchResults.innerHTML = '';
-        
-        if (results.length === 0) {
-            const noResults = document.createElement('div');
-            noResults.className = 'no-results';
-            noResults.textContent = 'No stories found';
-            searchResults.appendChild(noResults);
-        } else {
-            results.slice(0, 5).forEach((post, index) => {
-                const resultItem = document.createElement('a');
-                resultItem.href = post.url;
-                resultItem.className = 'search-result';
-                resultItem.style.animationDelay = `${index * 50}ms`;
-                resultItem.innerHTML = `
-                    <div class="search-result-item">
-                        <div class="search-result-title">${highlightMatches(post.title, searchInput.value.trim())}</div>
-                        <div class="search-result-excerpt">${highlightMatches(post.excerpt, searchInput.value.trim())}</div>
-                    </div>
-                `;
-                searchResults.appendChild(resultItem);
+        if (titleElement) {
+            const title = titleElement.textContent.trim();
+            const content = contentElement ? contentElement.textContent.trim() : '';
+            const url = card.getAttribute('href') || '';
+            
+            // Extract date and author from meta
+            let date = '';
+            let author = '';
+            if (metaElement) {
+                const metaText = metaElement.textContent;
+                const dateMatch = metaText.match(/([A-Za-z]+\s+\d{1,2},\s+\d{4})/);
+                const authorMatch = metaText.match(/by\s+([^•]+)/);
+                
+                date = dateMatch ? dateMatch[1] : '';
+                author = authorMatch ? authorMatch[1].trim() : '';
+            }
+            
+            posts.push({
+                title: title,
+                content: content,
+                author: author,
+                date: date,
+                url: url,
+                element: card
             });
         }
-        
-        showResults();
+    });
+    
+    return posts;
+}
+
+// Search functionality
+function performSearch(query) {
+    if (!query.trim()) {
+        hideSearchResults();
+        return;
     }
 
-    // Highlight matching text in search results
-    function highlightMatches(text, searchTerm) {
-        if (!searchTerm) return text;
-        
-        const regex = new RegExp(`(${searchTerm})`, 'gi');
-        return text.replace(regex, '<span class="highlight">$1</span>');
-    }
-
-    // Show results with animation
-    function showResults() {
-        searchResults.classList.add('visible');
-        document.addEventListener('click', handleClickOutside);
-    }
-
-    // Hide results with animation
-    function hideResults() {
-        searchResults.classList.remove('visible');
-        document.removeEventListener('click', handleClickOutside);
-    }
-
-    // Handle click outside search container
-    function handleClickOutside(e) {
-        if (!e.target.closest('.search-container')) {
-            hideResults();
-        }
-    }
-
-    // Event listeners
-    searchInput.addEventListener('input', (e) => {
-        debounceSearch(e.target.value);
+    const searchTerm = query.toLowerCase().trim();
+    const blogPosts = getPostsFromPage();
+    
+    const results = blogPosts.filter(post => {
+        const titleMatch = post.title.toLowerCase().includes(searchTerm);
+        return titleMatch; // Only search in titles (h2 elements)
     });
 
-    searchInput.addEventListener('focus', () => {
-        if (searchInput.value.trim() !== '') {
-            searchPosts(searchInput.value.trim());
+    displaySearchResults(results, searchTerm);
+}
+
+function displaySearchResults(results, searchTerm) {
+    if (results.length === 0) {
+        searchResults.innerHTML = `
+            <div class="search-result-item">
+                <div style="padding: 1rem 1.25rem; color: #888; text-align: center;">
+                    <div style="margin-bottom: 0.5rem;">🔍</div>
+                    <div>No posts found for "${searchTerm}"</div>
+                    <div style="font-size: 0.85rem; margin-top: 0.5rem;">Try different keywords</div>
+                </div>
+            </div>
+        `;
+    } else {
+        searchResults.innerHTML = results.map((post, index) => `
+            <div class="search-result-item" style="--delay: ${index * 0.05}s">
+                <a href="${post.url}">
+                    <div class="search-result-title">${highlightMatch(post.title, searchTerm)}</div>
+                    <div style="color: #b0b0b0; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                        ${highlightMatch(post.content.substring(0, 80), searchTerm)}${post.content.length > 80 ? '...' : ''}
+                    </div>
+                    <div style="color: #777; font-size: 0.8rem;">
+                        <span>${post.date}</span> • <span>by ${post.author}</span>
+                    </div>
+                </a>
+            </div>
+        `).join('');
+    }
+    
+    showSearchResults();
+}
+
+function highlightMatch(text, searchTerm) {
+    if (!searchTerm) return text;
+    
+    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    return text.replace(regex, '<mark style="background: rgba(77, 166, 255, 0.3); color: #4da6ff; padding: 0 2px; border-radius: 2px;">$1</mark>');
+}
+
+function showSearchResults() {
+    searchResults.classList.add('visible');
+}
+
+function hideSearchResults() {
+    searchResults.classList.remove('visible');
+}
+
+// Event listeners
+searchInput.addEventListener('input', (e) => {
+    const query = e.target.value;
+    performSearch(query);
+});
+
+searchInput.addEventListener('focus', () => {
+    if (searchInput.value.trim()) {
+        performSearch(searchInput.value);
+    }
+});
+
+searchButton.addEventListener('click', () => {
+    const query = searchInput.value;
+    if (query.trim()) {
+        performSearch(query);
+    }
+});
+
+// Close search results when clicking outside
+document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !searchButton.contains(e.target) && !searchResults.contains(e.target)) {
+        hideSearchResults();
+    }
+});
+
+// Keyboard navigation
+searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        hideSearchResults();
+        searchInput.blur();
+    } else if (e.key === 'Enter') {
+        const firstResult = searchResults.querySelector('a');
+        if (firstResult) {
+            firstResult.click();
+        }
+    }
+});
+
+// Debounce function to improve performance
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Apply debouncing to search
+const debouncedSearch = debounce(performSearch, 300);
+searchInput.addEventListener('input', (e) => {
+    debouncedSearch(e.target.value);
+});
+
+// Initialize search container
+document.addEventListener('DOMContentLoaded', () => {
+    // Add loading state
+    searchInput.addEventListener('input', () => {
+        if (searchInput.value.trim()) {
+            searchButton.style.opacity = '0.7';
+        } else {
+            searchButton.style.opacity = '1';
         }
     });
-
-    // Close search results when pressing Escape
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            hideResults();
-        }
-    });
-
-    // Initialize
-    fetchPosts();
 });

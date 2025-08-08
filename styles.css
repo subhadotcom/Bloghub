@@ -101,12 +101,37 @@ header h1:hover {
   color: #999;
 }
 
+.search-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  background: transparent;
+  border: none;
+  padding: 0 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 20px 20px 0;
+  transition: background-color 0.2s ease;
+}
+
+.search-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.search-button:focus {
+  outline: none;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
 .search-icon {
   position: absolute;
   right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  color: #888;
+  color: #666;
   pointer-events: none;
   transition: all 0.2s ease;
   width: 18px;
