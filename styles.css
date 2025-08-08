@@ -1296,3 +1296,37 @@ main {
         grid-column: span 1;
     }
 }
+
+/* Extra small mobile devices - Search input optimization */
+@media (max-width: 480px) {
+    .search-container {
+        margin: 0.5rem 0;
+    }
+
+    #searchInput {
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 6px;
+    }
+
+    #searchInput:focus {
+        padding: 10px 12px;
+    }
+}
+
+/* Very small mobile devices - Search input optimization */
+@media (max-width: 360px) {
+    .search-container {
+        margin: 0.25rem 0;
+    }
+
+    #searchInput {
+        padding: 8px 10px;
+        font-size: 13px;
+        border-radius: 4px;
+    }
+
+    #searchInput:focus {
+        padding: 8px 10px;
+    }
+}
