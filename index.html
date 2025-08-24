@@ -8,12 +8,16 @@
 </head>
 <body>
   <header>
-    <h1>Bloghub</h1>
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search posts...">
-        <div id="searchResults" class="search-results"></div>
-    </div>
-</header>
+        <div class="header-content">
+            <div class="header-left">
+                <h1>My Blog</h1>
+            </div>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search posts..." autocomplete="off" spellcheck="false">
+                <div id="searchResults" style="display: none;"></div>
+            </div>
+        </div>
+    </header>
   <main>
     <main class="posts-container">
         <div class="post-grid">
@@ -42,5 +46,6 @@
   </main>
   <script src="script.js"></script>
   <script src="tilt-effect.js"></script>
+  <script src="modern-ui.js"></script>
 </body>
 </html>

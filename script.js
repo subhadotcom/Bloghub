@@ -2,7 +2,7 @@
 const searchInput = document.getElementById('searchInput');
 const searchResults = document.getElementById('searchResults');
 
-// Search functionality
+// Enhanced search functionality with optimized fuzzy matching
 function performSearch(query) {
     if (!query.trim()) {
         hideSearchResults();
@@ -13,6 +13,14 @@ function performSearch(query) {
     const postCards = document.querySelectorAll('.post-card');
     const results = [];
     
+    // Debounce search for better performance
+    clearTimeout(window.searchTimeout);
+    window.searchTimeout = setTimeout(() => {
+        performActualSearch(searchTerm, postCards, results);
+    }, 150);
+}
+
+function performActualSearch(searchTerm, postCards, results) {
     postCards.forEach(card => {
         const titleElement = card.querySelector('h2');
         if (titleElement) {
@@ -20,83 +28,299 @@ function performSearch(query) {
             const titleLower = title.toLowerCase();
             const url = card.getAttribute('href');
             const content = card.querySelector('p')?.textContent || '';
+            const contentLower = content.toLowerCase();
+            const metaText = card.querySelector('.post-meta')?.textContent?.toLowerCase() || '';
             
             let score = 0;
             let matchType = '';
+            let highlightTitle = title;
+            let highlightContent = content.substring(0, 120) + (content.length > 120 ? '...' : '');
             
-            // Exact title match (highest priority)
+            // Advanced scoring system
             if (titleLower === searchTerm) {
                 score = 100;
                 matchType = 'exact';
+                highlightTitle = highlightSearchTerm(title, searchTerm);
             }
-            // Title starts with search term
             else if (titleLower.startsWith(searchTerm)) {
-                score = 90;
-                matchType = 'starts-with';
+                score = 95;
+                matchType = 'title-start';
+                highlightTitle = highlightSearchTerm(title, searchTerm);
             }
-            // Title contains search term
             else if (titleLower.includes(searchTerm)) {
-                score = 80;
-                matchType = 'contains';
+                score = 85;
+                matchType = 'title-match';
+                highlightTitle = highlightSearchTerm(title, searchTerm);
             }
-            // Word boundary match
+            else if (contentLower.includes(searchTerm)) {
+                score = 70;
+                matchType = 'content-match';
+                highlightContent = highlightSearchTerm(highlightContent, searchTerm);
+            }
+            else if (metaText.includes(searchTerm)) {
+                score = 65;
+                matchType = 'meta-match';
+            }
             else {
+                // Enhanced fuzzy matching
                 const titleWords = titleLower.split(/\s+/);
+                const contentWords = contentLower.split(/\s+/).slice(0, 20); // Limit for performance
                 const searchWords = searchTerm.split(/\s+/);
-                const wordMatches = searchWords.filter(word => 
-                    titleWords.some(titleWord => titleWord.startsWith(word))
-                ).length;
                 
-                if (wordMatches > 0) {
-                    score = 70 + (wordMatches * 10);
-                    matchType = 'word-match';
+                let titleScore = calculateWordMatches(titleWords, searchWords) * 20;
+                let contentScore = calculateWordMatches(contentWords, searchWords) * 10;
+                
+                // Semantic similarity (partial matches)
+                titleScore += calculatePartialMatches(titleLower, searchTerm) * 15;
+                contentScore += calculatePartialMatches(contentLower, searchTerm) * 8;
+                
+                score = titleScore + contentScore;
+                
+                if (score > 30) {
+                    matchType = 'semantic';
+                    if (titleScore > contentScore) {
+                        highlightTitle = highlightPartialMatches(title, searchTerm);
+                    } else {
+                        highlightContent = highlightPartialMatches(highlightContent, searchTerm);
+                    }
                 }
             }
             
             if (score > 0) {
                 results.push({ 
-                    title: title, 
+                    title: highlightTitle, 
+                    originalTitle: title,
                     url, 
-                    content,
-                    score,
+                    content: highlightContent,
+                    score: Math.round(score),
                     matchType
                 });
             }
         }
     });
     
-    // Sort results by score (highest first)
-    results.sort((a, b) => b.score - a.score);
+    // Sort results by score and relevance
+    results.sort((a, b) => {
+        if (b.score === a.score) {
+            return a.originalTitle.length - b.originalTitle.length; // Prefer shorter titles
+        }
+        return b.score - a.score;
+    });
     
     displaySearchResults(results, searchTerm);
 }
 
-function displaySearchResults(results, searchTerm) {
-    if (results.length === 0) {
-        searchResults.innerHTML = `
-            <div class="search-result-item">
-                <div style="padding: 1rem; color: #888; text-align: center;">
-                    <div>No results found for "${searchTerm}"</div>
-                </div>
-            </div>
-        `;
-    } else {
-        searchResults.innerHTML = `
-            <div class="search-result-item" style="padding: 0.75rem 1rem; border-bottom: 1px solid #404040; color: #4da6ff; font-size: 0.9rem; font-weight: 500;">
-                Found ${results.length} result${results.length > 1 ? 's' : ''} for "${searchTerm}"
-            </div>
-            ${results.map((post, index) => `
-                <div class="search-result-item">
-                    <a href="${post.url}" style="color: #e0e0e0; text-decoration: none; display: block;" onclick="clearSearch()">
-                        <h3>${post.title}</h3>
-                        <p>${post.content.substring(0, 80)}...</p>
-                    </a>
-                </div>
-            `).join('')}
-        `;
+// Enhanced word matching algorithm
+function calculateWordMatches(words, searchWords) {
+    let matches = 0;
+    searchWords.forEach(searchWord => {
+        words.forEach(word => {
+            if (word.startsWith(searchWord) && searchWord.length > 2) {
+                matches += searchWord.length / word.length;
+            } else if (levenshteinDistance(word, searchWord) <= Math.max(1, Math.floor(searchWord.length * 0.2))) {
+                matches += 0.7;
+            }
+        });
+    });
+    return matches;
+}
+
+// Calculate partial matches for semantic similarity
+function calculatePartialMatches(text, searchTerm) {
+    let score = 0;
+    const searchLength = searchTerm.length;
+    
+    for (let i = 0; i <= text.length - searchLength; i++) {
+        const substring = text.substring(i, i + searchLength);
+        const similarity = 1 - (levenshteinDistance(substring, searchTerm) / searchLength);
+        if (similarity > 0.7) {
+            score += similarity;
+        }
+    }
+    return score;
+}
+
+// Enhanced highlighting for partial matches
+function highlightPartialMatches(text, term) {
+    const words = term.split(/\s+/);
+    let result = text;
+    
+    words.forEach(word => {
+        if (word.length > 2) {
+            const regex = new RegExp(`(${word})`, 'gi');
+            result = result.replace(regex, '<mark style="background: rgba(77, 166, 255, 0.3); color: #4da6ff; padding: 0 2px; border-radius: 3px;">$1</mark>');
+        }
+    });
+    
+    return result;
+}
+
+// Highlight search terms in results
+function highlightSearchTerm(text, term) {
+    if (!term) return text;
+    const regex = new RegExp(`(${term})`, 'gi');
+    return text.replace(regex, '<mark style="background: rgba(77, 166, 255, 0.3); color: #4da6ff; padding: 0 2px; border-radius: 3px;">$1</mark>');
+}
+
+// Simple fuzzy matching
+function fuzzyMatch(text, pattern) {
+    const textLen = text.length;
+    const patternLen = pattern.length;
+    
+    if (patternLen > textLen) return false;
+    if (patternLen === textLen) return text === pattern;
+    
+    let textIndex = 0;
+    let patternIndex = 0;
+    let matches = 0;
+    
+    while (textIndex < textLen && patternIndex < patternLen) {
+        if (text[textIndex] === pattern[patternIndex]) {
+            matches++;
+            patternIndex++;
+        }
+        textIndex++;
     }
     
+    return matches / patternLen > 0.7;
+}
+
+// Levenshtein distance for typo tolerance
+function levenshteinDistance(str1, str2) {
+    const matrix = [];
+    
+    for (let i = 0; i <= str2.length; i++) {
+        matrix[i] = [i];
+    }
+    
+    for (let j = 0; j <= str1.length; j++) {
+        matrix[0][j] = j;
+    }
+    
+    for (let i = 1; i <= str2.length; i++) {
+        for (let j = 1; j <= str1.length; j++) {
+            if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1,
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j] + 1
+                );
+            }
+        }
+    }
+    
+    return matrix[str2.length][str1.length];
+}
+
+function displaySearchResults(results, searchTerm) {
+    // Performance optimization: use DocumentFragment for better rendering
+    const fragment = document.createDocumentFragment();
+    
+    if (results.length === 0) {
+        const noResultsDiv = document.createElement('div');
+        noResultsDiv.className = 'search-result-item';
+        noResultsDiv.style.setProperty('--result-index', '0');
+        noResultsDiv.innerHTML = `
+            <div style="padding: 1.5rem; color: #888; text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem; animation: bounce 1s ease-in-out;">🔍</div>
+                <div style="font-weight: 500; margin-bottom: 0.5rem;">No results found for "${searchTerm}"</div>
+                <div style="font-size: 0.85rem; color: #666; margin-bottom: 1rem;">Try different keywords or check spelling</div>
+                <div style="font-size: 0.8rem; color: #888;">
+                    💡 <strong>Search tips:</strong> Use shorter terms, check for typos, or try synonyms
+                </div>
+            </div>
+        `;
+        fragment.appendChild(noResultsDiv);
+    } else {
+        const totalResults = results.length;
+        
+        // Results header with enhanced info
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'search-result-item';
+        headerDiv.style.setProperty('--result-index', '0');
+        headerDiv.style.cssText = 'padding: 0.75rem 1rem; border-bottom: 1px solid #404040; color: #4da6ff; font-size: 0.9rem; font-weight: 500; background: rgba(77, 166, 255, 0.05);';
+        headerDiv.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="animation: pulse 2s infinite;">🎯</span>
+                    <span>Found ${totalResults} result${totalResults > 1 ? 's' : ''} for "${searchTerm}"</span>
+                </div>
+                <div style="font-size: 0.8rem; opacity: 0.7;">
+                    ${(performance.now() - window.searchStartTime || 0).toFixed(0)}ms
+                </div>
+            </div>
+        `;
+        fragment.appendChild(headerDiv);
+        
+        // Display top results with enhanced UI
+        results.slice(0, 8).forEach((post, index) => {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'search-result-item';
+            resultDiv.style.setProperty('--result-index', index + 1);
+            resultDiv.style.cursor = 'pointer';
+            resultDiv.onclick = () => navigateToPost(post.url);
+            
+            const matchTypeColor = getMatchTypeColor(post.matchType);
+            const scoreBar = post.score > 80 ? '🔥' : post.score > 60 ? '⭐' : '💡';
+            
+            resultDiv.innerHTML = `
+                <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.25rem;">
+                        <div style="background: ${matchTypeColor}; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; white-space: nowrap;">
+                            ${post.matchType}
+                        </div>
+                        <div style="font-size: 0.8rem;">${scoreBar}</div>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <h3 style="margin: 0 0 0.5rem 0; font-size: 1rem; line-height: 1.3; word-wrap: break-word;">${post.title}</h3>
+                        <p style="margin: 0; font-size: 0.85rem; line-height: 1.4; opacity: 0.8; word-wrap: break-word;">${post.content}</p>
+                        ${post.score ? `<div style="font-size: 0.7rem; color: #666; margin-top: 0.25rem;">Relevance: ${post.score}%</div>` : ''}
+                    </div>
+                </div>
+            `;
+            fragment.appendChild(resultDiv);
+        });
+        
+        // Show "more results" indicator
+        if (totalResults > 8) {
+            const moreDiv = document.createElement('div');
+            moreDiv.className = 'search-result-item';
+            moreDiv.style.setProperty('--result-index', '9');
+            moreDiv.style.cssText = 'padding: 0.75rem 1rem; color: #888; font-size: 0.85rem; text-align: center; border-top: 1px solid #404040; background: rgba(77, 166, 255, 0.02);';
+            moreDiv.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <span>📋</span>
+                    <span>And ${totalResults - 8} more results... <em>Refine your search for better results</em></span>
+                </div>
+            `;
+            fragment.appendChild(moreDiv);
+        }
+    }
+    
+    // Clear and append new results
+    searchResults.innerHTML = '';
+    searchResults.appendChild(fragment);
     showSearchResults();
+}
+
+function getMatchTypeColor(matchType) {
+    const colors = {
+        'exact': '#4da6ff',
+        'title-start': '#00d4aa',
+        'title-match': '#ffa726',
+        'content-match': '#ab47bc',
+        'meta-match': '#66bb6a',
+        'semantic': '#ff7043',
+        'fuzzy': '#78909c'
+    };
+    return colors[matchType] || '#666';
+}
+
+function navigateToPost(url) {
+    clearSearch();
+    window.location.href = url;
 }
 
 function clearSearch() {
@@ -339,6 +563,8 @@ function goBack() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Search initialized');
     initializeShareButtons();
+    animateCards();
+    initializeMouseTracking();
     
     // Check if current page is bookmarked
     const currentUrl = window.location.href;
@@ -353,3 +579,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+// Animate cards with staggered timing
+function animateCards() {
+    const cards = document.querySelectorAll('.post-card');
+    cards.forEach((card, index) => {
+        card.style.setProperty('--card-delay', `${index * 0.1}s`);
+    });
+}
+
+// Mouse tracking for post cards
+function initializeMouseTracking() {
+    const cards = document.querySelectorAll('.post-card');
+    
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            
+            card.style.setProperty('--mouse-x', `${x}%`);
+            card.style.setProperty('--mouse-y', `${y}%`);
+            
+            card.style.setProperty('--after-opacity', '1');
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.setProperty('--after-opacity', '0');
+        });
+    });
+}
