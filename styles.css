@@ -538,6 +538,71 @@ main {
     will-change: transform !important;
   }
 
+  /* Mobile-specific styles - disable tilt effects */
+  @media (max-width: 768px) {
+    .post-card {
+      transform-style: flat !important;
+      will-change: auto !important;
+      /* Optimize for mobile performance */
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+    
+    .post-card:hover {
+      transform: none !important;
+    }
+    
+    /* Simple mobile touch feedback */
+    .post-card:active {
+      transform: scale(0.98) !important;
+      transition: transform 0.2s ease !important;
+    }
+    
+    /* Disable complex animations on mobile for better performance */
+    .post-card::after {
+      display: none !important;
+    }
+    
+    /* Optimize transitions for mobile */
+    .post-card {
+      transition: all 0.2s ease !important;
+    }
+  }
+
+  /* Tablet styles - enable tilt but with reduced intensity */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .post-card {
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+    
+    /* Reduce tilt intensity on tablets for better performance */
+    .post-card.tilt-active {
+      transform: perspective(800px) rotateX(var(--tilt-rotate-x, 0deg)) rotateY(var(--tilt-rotate-y, 0deg)) scale3d(1.01, 1.01, 1.01) !important;
+    }
+  }
+
+  /* Desktop styles - full tilt effect */
+  @media (min-width: 1025px) {
+    .post-card {
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+    
+    /* Full tilt effect on desktop */
+    .post-card.tilt-active {
+      transform: perspective(1000px) rotateX(var(--tilt-rotate-x, 0deg)) rotateY(var(--tilt-rotate-y, 0deg)) scale3d(1.02, 1.02, 1.02) !important;
+    }
+  }
+
+  /* Ensure tilt only works on larger screens */
+  @media (min-width: 769px) {
+    .post-card {
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+  }
+
   /* Header parallax styling */
   header {
     backdrop-filter: blur(10px);
