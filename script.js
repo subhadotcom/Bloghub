@@ -699,3 +699,65 @@ function animateCards() {
         card.style.setProperty('--card-delay', `${index * 0.1}s`);
     });
 }
+
+
+
+// Disable right-click, keyboard shortcuts, and browser inspection
+document.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    alert('Right-click is disabled to protect the content.');
+});
+
+// Disable keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+    if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) ||
+        (e.ctrlKey && (e.key === 'U' || e.key === 'u'))
+    ) {
+        e.preventDefault();
+        alert('This action is disabled to protect the content.');
+    }
+});
+
+// Prevent opening developer tools
+(function() {
+    // Prevent opening developer tools
+    const devtools = /./;
+    devtools.toString = function() {
+        this.opened = true;
+    }
+    console.log('%c', devtools);
+    devtools.opened = false;
+
+    setInterval(function() {
+        if (devtools.opened) {
+            alert('Developer tools are disabled to protect the content.');
+            window.location.reload();
+        }
+    }, 1000);
+})();
+
+// Prevent taking screenshots
+document.addEventListener('keyup', (e) => {
+    if (e.key === 'PrintScreen') {
+        navigator.clipboard.writeText('');
+        alert('Screenshots are disabled to protect the content.');
+    }
+});
+
+// Prevent drag and drop
+document.addEventListener('dragstart', (e) => {
+    e.preventDefault();
+});
+
+// Prevent text selection
+document.addEventListener('selectstart', (e) => {
+    e.preventDefault();
+});
+
+// Prevent image dragging
+document.querySelectorAll('img').forEach(img => {
+    img.setAttribute('draggable', 'false');
+});
