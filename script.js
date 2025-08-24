@@ -676,7 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeShareButtons();
     animateCards();
-    initializeMouseTracking();
+    // Removed initializeMouseTracking() - now handled by tilt-effect.js
     
     // Check if current page is bookmarked
     const currentUrl = window.location.href;
@@ -697,27 +697,5 @@ function animateCards() {
     const cards = document.querySelectorAll('.post-card');
     cards.forEach((card, index) => {
         card.style.setProperty('--card-delay', `${index * 0.1}s`);
-    });
-}
-
-// Mouse tracking for post cards
-function initializeMouseTracking() {
-    const cards = document.querySelectorAll('.post-card');
-    
-    cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            
-            card.style.setProperty('--mouse-x', `${x}%`);
-            card.style.setProperty('--mouse-y', `${y}%`);
-            
-            card.style.setProperty('--after-opacity', '1');
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.setProperty('--after-opacity', '0');
-        });
     });
 }

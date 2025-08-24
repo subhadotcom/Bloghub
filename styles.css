@@ -132,14 +132,13 @@ main {
   min-height: 200px;
   margin: 0;
   border: 1px solid #404040;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
   overflow: hidden;
   height: 100%;
   box-sizing: border-box;
   transform-style: preserve-3d;
-  transform: perspective(1000px) rotateX(0) rotateY(0);
   will-change: transform;
 }
 
@@ -156,7 +155,6 @@ main {
 }
 
 .post-card:hover {
-  transform: perspective(1000px) rotateX(0) rotateY(0) translateY(-5px);
   box-shadow: 0 20px 40px rgba(0,0,0,0.3);
   border-color: #4da6ff;
   background: #333;
@@ -166,7 +164,6 @@ main {
 /* Reduce hover effect on touch devices */
 @media (hover: none) {
   .post-card:hover {
-    transform: none;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   }
 
@@ -490,13 +487,13 @@ main {
     animation: cardFadeIn 0.6s ease forwards;
     animation-delay: var(--card-delay, 0s);
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(30px) perspective(1000px) rotateX(0) rotateY(0);
   }
 
   @keyframes cardFadeIn {
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) perspective(1000px) rotateX(0) rotateY(0);
     }
   }
 
@@ -522,6 +519,23 @@ main {
   /* Smooth transitions for all interactive elements */
   * {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Exclude transform from global transitions to allow tilt effect */
+  .post-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.1s ease-out;
+  }
+
+  /* Ensure tilt effect has priority */
+  .post-card[style*="transform"] {
+    transform: var(--tilt-transform) !important;
+    transition: transform 0.1s ease-out !important;
+  }
+
+  /* Tilt effect specific styles */
+  .post-card.tilt-active {
+    transform-style: preserve-3d !important;
+    will-change: transform !important;
   }
 
   /* Header parallax styling */
