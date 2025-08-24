@@ -2,9 +2,17 @@
 const searchInput = document.getElementById('searchInput');
 const searchResults = document.getElementById('searchResults');
 
+// Validate DOM elements
+if (!searchInput) {
+    console.error('Search input element not found! Make sure element with id="searchInput" exists.');
+}
+if (!searchResults) {
+    console.error('Search results element not found! Make sure element with id="searchResults" exists.');
+}
+
 // Enhanced search functionality with optimized fuzzy matching
 function performSearch(query) {
-    if (!query.trim()) {
+    if (!query || !query.trim()) {
         hideSearchResults();
         return;
     }
@@ -215,6 +223,7 @@ function levenshteinDistance(str1, str2) {
 }
 
 function displaySearchResults(results, searchTerm) {
+    
     // Performance optimization: use DocumentFragment for better rendering
     const fragment = document.createDocumentFragment();
     
@@ -323,18 +332,47 @@ function navigateToPost(url) {
     window.location.href = url;
 }
 
-function clearSearch() {
-    searchInput.value = '';
-    hideSearchResults();
-    searchInput.blur();
-}
-
-function showSearchResults() {
-    searchResults.style.display = 'block';
+// Force clear search results completely
+function forceClearSearchResults() {
+    if (searchResults) {
+        searchResults.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important;';
+        searchResults.innerHTML = '';
+        // Force a reflow
+        searchResults.offsetHeight;
+    }
 }
 
 function hideSearchResults() {
-    searchResults.style.display = 'none';
+    if (searchResults) {
+        searchResults.style.display = 'none';
+        searchResults.style.visibility = 'hidden';
+        searchResults.style.opacity = '0';
+        searchResults.style.pointerEvents = 'none';
+        // Clear the content to ensure no results remain
+        searchResults.innerHTML = '';
+        // Force a reflow to ensure the hiding takes effect
+        searchResults.offsetHeight;
+    } else {
+        console.error('Search results element not found!');
+    }
+}
+
+function clearSearch() {
+    if (searchInput) {
+        searchInput.value = '';
+        forceClearSearchResults();
+        searchInput.blur();
+    }
+}
+
+function showSearchResults() {
+    if (searchResults) {
+        searchResults.style.display = 'block';
+        searchResults.style.visibility = 'visible';
+        searchResults.style.opacity = '1';
+    } else {
+        console.error('Search results element not found!');
+    }
 }
 
 // Share functionality
@@ -517,17 +555,80 @@ function showCopyNotification() {
     }, 2000);
 }
 
+// Handle search input clearing
+function handleSearchInputChange(value) {
+    // Clear any existing timeout
+    clearTimeout(window.searchInputTimeout);
+    
+    if (value && value.trim()) {
+        // Small delay to ensure smooth typing
+        window.searchInputTimeout = setTimeout(() => {
+            performSearch(value);
+        }, 100);
+    } else {
+        // Immediately hide results when text is empty
+        hideSearchResults();
+    }
+}
 
 // Event listeners
-searchInput.addEventListener('input', (e) => {
-    performSearch(e.target.value);
-});
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+        if (value && value.trim()) {
+            handleSearchInputChange(value);
+        } else {
+            // Force clear results when input is empty
+            forceClearSearchResults();
+        }
+    });
 
-searchInput.addEventListener('focus', () => {
-    if (searchInput.value.trim()) {
-        performSearch(searchInput.value);
-    }
-});
+    searchInput.addEventListener('change', (e) => {
+        // Handle change events (when input loses focus)
+        const value = e.target.value;
+        if (!value || !value.trim()) {
+            forceClearSearchResults();
+        }
+    });
+
+    searchInput.addEventListener('focus', () => {
+        // Show results if there's text in the input
+        if (searchInput.value.trim()) {
+            performSearch(searchInput.value);
+        }
+    });
+
+    searchInput.addEventListener('click', () => {
+        // Show results if there's text in the input when clicked
+        if (searchInput.value.trim()) {
+            performSearch(searchInput.value);
+        }
+    });
+
+    searchInput.addEventListener('paste', (e) => {
+        // Handle paste events
+        setTimeout(() => {
+            const value = searchInput.value;
+            if (value && value.trim()) {
+                handleSearchInputChange(value);
+            } else {
+                forceClearSearchResults();
+            }
+        }, 10);
+    });
+
+    // Handle when user clears the input
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+            // If clearing the last character, force clear results
+            if (searchInput.value.length <= 1) {
+                forceClearSearchResults();
+            }
+        }
+    });
+} else {
+    console.error('Search input element not found!');
+}
 
 // Close search results when clicking outside
 document.addEventListener('click', (e) => {
@@ -561,7 +662,18 @@ function goBack() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Search initialized');
+    // Ensure search results are hidden on page load
+    if (searchResults) {
+        forceClearSearchResults();
+    }
+    
+    if (searchInput && searchResults) {
+        // Reset search input value
+        searchInput.value = '';
+    } else {
+        console.error('Search elements not found on DOM ready');
+    }
+    
     initializeShareButtons();
     animateCards();
     initializeMouseTracking();

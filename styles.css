@@ -583,7 +583,7 @@ main {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    overflow: hidden;
+    overflow: visible;
   }
 
   .search-container::before {
@@ -673,11 +673,32 @@ main {
     border: 1px solid #404040;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    z-index: 1000;
+    z-index: 10000;
     max-height: 70vh;
     overflow-y: auto;
     animation: searchResultsIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: top center;
+    display: none;
+    min-height: 50px;
+    visibility: visible;
+    opacity: 1;
+  }
+
+  #searchResults:not([style*="display: none"]) {
+    display: block !important;
+  }
+
+  /* Ensure search results are visible when they have content */
+  #searchResults:has(.search-result-item) {
+    display: block !important;
+  }
+
+  /* Force hide search results when they should be hidden */
+  #searchResults[style*="display: none"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 
   .search-result-item {
