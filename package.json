@@ -1,0 +1,13 @@
+{
+  "name": "bloghub-newsletter",
+  "version": "1.0.0",
+  "description": "Bloghub newsletter subscription system for GitHub Pages",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "start": "python -m http.server 8000"
+  },
+  "keywords": ["newsletter", "github-pages", "html", "blog", "static"],
+  "author": "Your Name",
+  "license": "MIT"
+}

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscribe to Newsletter - Bloghub</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- EmailJS SDK -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <!-- Configuration -->
+  <script src="config.js"></script>
+  <style>
+    /* Newsletter specific styles */
+    .newsletter-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+      min-height: calc(100vh - 200px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .newsletter-card {
+      background: #2d2d2d;
+      border-radius: 20px;
+      padding: 3rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      border: 1px solid #404040;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .newsletter-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(77, 166, 255, 0.1) 0%, rgba(0, 212, 170, 0.1) 100%);
+      border-radius: inherit;
+      z-index: 0;
+    }
+
+    .newsletter-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .newsletter-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .newsletter-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #f0f0f0;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #4da6ff, #00d4aa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .newsletter-subtitle {
+      font-size: 1.2rem;
+      color: #a0a0a0;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .newsletter-form {
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      color: #e0e0e0;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: #333;
+      border: 2px solid #404040;
+      border-radius: 12px;
+      color: #e0e0e0;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #4da6ff;
+      box-shadow: 0 0 0 3px rgba(77, 166, 255, 0.1);
+      background: #2a2a2a;
+    }
+
+    .form-input::placeholder {
+      color: #888;
+    }
+
+    .subscribe-btn {
+      width: 100%;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, #4da6ff, #00d4aa);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .subscribe-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(77, 166, 255, 0.3);
+    }
+
+    .subscribe-btn:active {
+      transform: translateY(0);
+    }
+
+    .subscribe-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .newsletter-benefits {
+      text-align: left;
+      margin-top: 2rem;
+    }
+
+    .benefits-title {
+      color: #f0f0f0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .benefits-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .benefits-list li {
+      color: #a0a0a0;
+      margin-bottom: 0.8rem;
+      padding-left: 1.5rem;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .benefits-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #00d4aa;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .newsletter-footer {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid #404040;
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .success-message {
+      display: none;
+      background: rgba(0, 212, 170, 0.1);
+      border: 1px solid #00d4aa;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      color: #00d4aa;
+      text-align: center;
+    }
+
+    .error-message {
+      display: none;
+      background: rgba(255, 107, 107, 0.1);
+      border: 1px solid #ff6b6b;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      color: #ff6b6b;
+      text-align: center;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .newsletter-container {
+        padding: 1rem;
+      }
+
+      .newsletter-card {
+        padding: 2rem;
+      }
+
+      .newsletter-title {
+        font-size: 2rem;
+      }
+
+      .newsletter-subtitle {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <h1><a href="index.html" style="text-decoration: none; color: inherit;">My Blog</a></h1>
+      </div>
+      <div class="header-right">
+        <div class="search-container">
+          <input type="text" id="searchInput" placeholder="Search posts..." autocomplete="off" spellcheck="false">
+          <div id="searchResults" style="display: none;"></div>
+        </div>
+        <a href="newsletter.html" class="newsletter-link" style="margin-left: 1rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #4da6ff, #00d4aa); color: white; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; font-size: 0.9rem;">📧 Newsletter</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="newsletter-container">
+    <div class="newsletter-card">
+      <div class="newsletter-content">
+        <div class="newsletter-icon">📧</div>
+        <h1 class="newsletter-title">Stay Updated</h1>
+        <p class="newsletter-subtitle">
+          Subscribe to our newsletter and never miss a new post. Get the latest articles, 
+          insights, and updates delivered directly to your inbox.
+        </p>
+
+        <div id="successMessage" class="success-message">
+          <strong>🎉 Success!</strong> You've been subscribed to our newsletter. Check your email for confirmation.
+        </div>
+
+        <div id="errorMessage" class="error-message">
+          <strong>❌ Error!</strong> Something went wrong. Please try again later.
+        </div>
+
+        <!-- Formspree Form for GitHub Pages -->
+        <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="newsletter-form" id="newsletterForm">
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address *</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              class="form-input" 
+              placeholder="Enter your email address"
+              required
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="name" class="form-label">Name (Optional)</label>
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              class="form-input" 
+              placeholder="Enter your name"
+            >
+          </div>
+
+          <!-- Hidden field for form identification -->
+          <input type="hidden" name="_subject" value="Newsletter Subscription">
+          <input type="hidden" name="_next" value="https://yourusername.github.io/Bloghub/newsletter.html?subscribed=true">
+          <input type="hidden" name="_replyto" value="">
+          <input type="hidden" name="_cc" value="">
+
+          <button type="submit" class="subscribe-btn" id="subscribeBtn">
+            <span id="btnText">Subscribe to Newsletter</span>
+            <span id="btnLoading" style="display: none;">Subscribing...</span>
+          </button>
+        </form>
+
+        <div class="newsletter-benefits">
+          <h3 class="benefits-title">What you'll get:</h3>
+          <ul class="benefits-list">
+            <li>Weekly digest of new blog posts</li>
+            <li>Exclusive content and insights</li>
+            <li>Early access to new features</li>
+            <li>No spam, unsubscribe anytime</li>
+            <li>Curated reading recommendations</li>
+          </ul>
+        </div>
+
+        <div class="newsletter-footer">
+          <p>
+            By subscribing, you agree to receive our newsletter. We respect your privacy 
+            and will never share your email address with third parties. You can unsubscribe 
+            at any time by clicking the link in our emails.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="tilt-effect.js"></script>
+  <script src="modern-ui.js"></script>
+  
+  <script>
+    // Newsletter subscription functionality for GitHub Pages
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('newsletterForm');
+      const emailInput = document.getElementById('email');
+      const nameInput = document.getElementById('name');
+      const subscribeBtn = document.getElementById('subscribeBtn');
+      const btnText = document.getElementById('btnText');
+      const btnLoading = document.getElementById('btnLoading');
+      const successMessage = document.getElementById('successMessage');
+      const errorMessage = document.getElementById('errorMessage');
+
+      // Form validation
+      function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+      }
+
+      // Show success message
+      function showSuccess() {
+        successMessage.style.display = 'block';
+        errorMessage.style.display = 'none';
+        form.style.display = 'none';
+        setTimeout(() => {
+          successMessage.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+
+      // Show error message
+      function showError(message) {
+        errorMessage.innerHTML = `<strong>❌ Error!</strong> ${message}`;
+        errorMessage.style.display = 'block';
+        successMessage.style.display = 'none';
+        setTimeout(() => {
+          errorMessage.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+
+      // Hide messages
+      function hideMessages() {
+        successMessage.style.display = 'none';
+        errorMessage.style.display = 'none';
+      }
+
+      // Set loading state
+      function setLoading(loading) {
+        subscribeBtn.disabled = loading;
+        if (loading) {
+          btnText.style.display = 'none';
+          btnLoading.style.display = 'inline';
+        } else {
+          btnText.style.display = 'inline';
+          btnLoading.style.display = 'none';
+        }
+      }
+
+      // Store subscription in localStorage
+      function storeSubscription(email, name) {
+        const subscriptions = JSON.parse(localStorage.getItem('newsletterSubscriptions') || '[]');
+        const existingSubscription = subscriptions.find(sub => sub.email === email);
+        
+        if (existingSubscription) {
+          return false; // Already subscribed
+        }
+
+        const newSubscription = {
+          email: email,
+          name: name,
+          subscribedAt: new Date().toISOString(),
+          id: Date.now().toString(),
+          source: 'newsletter-form'
+        };
+
+        subscriptions.push(newSubscription);
+        localStorage.setItem('newsletterSubscriptions', JSON.stringify(subscriptions));
+        return true;
+      }
+
+      // Send email using EmailJS (optional)
+      async function sendWelcomeEmail(email, name) {
+        if (!NEWSLETTER_CONFIG.EMAILJS.ENABLED) {
+          return false;
+        }
+
+        try {
+          // Initialize EmailJS with your service ID
+          emailjs.init(NEWSLETTER_CONFIG.EMAILJS.SERVICE_ID);
+          
+          const templateParams = {
+            to_email: email,
+            to_name: name || 'there',
+            from_name: 'Bloghub Team',
+            message: `Welcome to our newsletter! We're excited to have you as part of our community.`
+          };
+
+          // Send email using EmailJS
+          await emailjs.send(NEWSLETTER_CONFIG.EMAILJS.SERVICE_ID, NEWSLETTER_CONFIG.EMAILJS.TEMPLATE_ID, templateParams);
+          return true;
+        } catch (error) {
+          console.error('EmailJS error:', error);
+          return false;
+        }
+      }
+
+      // Handle form submission
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = emailInput.value.trim();
+        const name = nameInput.value.trim();
+
+        // Validate email
+        if (!email) {
+          showError('Please enter your email address.');
+          return;
+        }
+
+        if (!validateEmail(email)) {
+          showError('Please enter a valid email address.');
+          return;
+        }
+
+        // Hide previous messages
+        hideMessages();
+
+        // Set loading state
+        setLoading(true);
+
+        try {
+          // Store in localStorage
+          const stored = storeSubscription(email, name);
+          
+          if (!stored) {
+            showError('This email is already subscribed to our newsletter.');
+            setLoading(false);
+            return;
+          }
+
+          // Set the _replyto field for Formspree
+          document.querySelector('input[name="_replyto"]').value = email;
+
+          // Send welcome email (optional)
+          const emailSent = await sendWelcomeEmail(email, name);
+          
+          if (emailSent) {
+            showSuccess();
+          } else {
+            // Still show success but mention email might be delayed
+            successMessage.innerHTML = `
+              <strong>🎉 Success!</strong> You've been subscribed to our newsletter. 
+              <br><small>Note: Email confirmation might be delayed.</small>
+            `;
+            showSuccess();
+          }
+
+        } catch (error) {
+          console.error('Subscription error:', error);
+          showError('Failed to subscribe. Please try again later.');
+        } finally {
+          setLoading(false);
+        }
+      });
+
+      // Real-time email validation
+      emailInput.addEventListener('blur', function() {
+        const email = this.value.trim();
+        if (email && !validateEmail(email)) {
+          this.style.borderColor = '#ff6b6b';
+        } else {
+          this.style.borderColor = '#404040';
+        }
+      });
+
+      // Clear validation on input
+      emailInput.addEventListener('input', function() {
+        this.style.borderColor = '#404040';
+        hideMessages();
+      });
+
+      // Check if coming from successful form submission
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('subscribed') === 'true') {
+        showSuccess();
+      }
+    });
+  </script>
+</body>
+</html>
