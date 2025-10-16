@@ -4,7 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post Title - Bloghub</title>
+    <meta name="description" content="Post description - A brief summary of your blog post content.">
+    <meta name="keywords" content="blog, writing, stories, fiction, creative writing">
+    <meta name="author" content="Subha">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://yourusername.github.io/Bloghub/post-template.html">
+    <meta property="og:title" content="Post Title - Bloghub">
+    <meta property="og:description" content="Post description - A brief summary of your blog post content.">
+    <meta property="og:image" content="https://yourusername.github.io/Bloghub/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://yourusername.github.io/Bloghub/post-template.html">
+    <meta property="twitter:title" content="Post Title - Bloghub">
+    <meta property="twitter:description" content="Post description - A brief summary of your blog post content.">
+    <meta property="twitter:image" content="https://yourusername.github.io/Bloghub/og-image.jpg">
+
+    <!-- Article specific meta -->
+    <meta property="article:published_time" content="2025-08-07T00:00:00Z">
+    <meta property="article:author" content="Subha">
+    <meta property="article:section" content="Fiction">
+    <meta property="article:tag" content="fiction">
+    <meta property="article:tag" content="creative writing">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Google Analytics (replace GA_TRACKING_ID with your actual ID) -->
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=GA_TRACKING_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'GA_TRACKING_ID');
+    </script> -->
 </head>
 <body>
     <header>
@@ -16,9 +53,10 @@
             </div>
             <div class="header-right">
                 <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="Search posts...">
-                    <div id="searchResults" class="search-results"></div>
+                    <input type="text" id="searchInput" placeholder="Search posts..." autocomplete="off" spellcheck="false">
+                    <div id="searchResults" style="display: none;"></div>
                 </div>
+                <a href="newsletter.html" class="newsletter-link" style="margin-left: 1rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #4da6ff, #00d4aa); color: white; text-decoration: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease; font-size: 0.9rem;">📧 Newsletter</a>
             </div>
         </div>
     </header>
@@ -75,7 +113,9 @@
         </article>
     </main>
 
+    <script src="config.js"></script>
     <script src="script.js"></script>
     <script src="tilt-effect.js"></script>
+    <script src="modern-ui.js"></script>
 </body>
 </html>

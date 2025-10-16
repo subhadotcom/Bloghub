@@ -4,9 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Subscribe to Newsletter - Bloghub</title>
+  <meta name="description" content="Subscribe to our newsletter for the latest blog posts, stories, and updates from Bloghub.">
+  <meta name="keywords" content="newsletter, subscribe, blog, updates, stories">
+  <meta name="author" content="Subha">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yourusername.github.io/Bloghub/newsletter.html">
+  <meta property="og:title" content="Subscribe to Newsletter - Bloghub">
+  <meta property="og:description" content="Subscribe to our newsletter for the latest blog posts, stories, and updates from Bloghub.">
+  <meta property="og:image" content="https://yourusername.github.io/Bloghub/og-image.jpg">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://yourusername.github.io/Bloghub/newsletter.html">
+  <meta property="twitter:title" content="Subscribe to Newsletter - Bloghub">
+  <meta property="twitter:description" content="Subscribe to our newsletter for the latest blog posts, stories, and updates from Bloghub.">
+  <meta property="twitter:image" content="https://yourusername.github.io/Bloghub/og-image.jpg">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  
   <link rel="stylesheet" href="styles.css">
   <!-- EmailJS SDK -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  
   <!-- Configuration -->
   <script src="config.js"></script>
   <style>
@@ -270,7 +292,7 @@
         </div>
 
         <!-- Formspree Form for GitHub Pages -->
-        <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="newsletter-form" id="newsletterForm">
+        <form action="" method="POST" class="newsletter-form" id="newsletterForm">
           <div class="form-group">
             <label for="email" class="form-label">Email Address *</label>
             <input 
@@ -296,7 +318,7 @@
 
           <!-- Hidden field for form identification -->
           <input type="hidden" name="_subject" value="Newsletter Subscription">
-          <input type="hidden" name="_next" value="https://yourusername.github.io/Bloghub/newsletter.html?subscribed=true">
+          <input type="hidden" name="_next" value="" id="redirectUrl">
           <input type="hidden" name="_replyto" value="">
           <input type="hidden" name="_cc" value="">
 
@@ -343,6 +365,15 @@
       const btnLoading = document.getElementById('btnLoading');
       const successMessage = document.getElementById('successMessage');
       const errorMessage = document.getElementById('errorMessage');
+
+      // Set form action and redirect URL based on configuration
+      if (NEWSLETTER_CONFIG.FORMPREE.ENABLED && NEWSLETTER_CONFIG.FORMPREE.FORM_ID !== 'YOUR_FORM_ID') {
+        form.action = `https://formspree.io/f/${NEWSLETTER_CONFIG.FORMPREE.FORM_ID}`;
+        document.getElementById('redirectUrl').value = `${NEWSLETTER_CONFIG.SETTINGS.SITE_URL}/newsletter.html?subscribed=true`;
+      } else if (NEWSLETTER_CONFIG.GOOGLE_FORMS.ENABLED && NEWSLETTER_CONFIG.GOOGLE_FORMS.FORM_URL !== 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse') {
+        form.action = NEWSLETTER_CONFIG.GOOGLE_FORMS.FORM_URL;
+        document.getElementById('redirectUrl').value = `${NEWSLETTER_CONFIG.SETTINGS.SITE_URL}/newsletter.html?subscribed=true`;
+      }
 
       // Form validation
       function validateEmail(email) {
