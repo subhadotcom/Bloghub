@@ -1,5 +1,5 @@
 
-// Modern UI enhancements
+// Enhanced Modern UI enhancements
 document.addEventListener('DOMContentLoaded', () => {
     initializeScrollAnimations();
     initializeParallaxEffect();
@@ -7,17 +7,19 @@ document.addEventListener('DOMContentLoaded', () => {
     addLoadingAnimation();
     addBackgroundPatterns();
     initializeCardAnimations();
-    // Removed initializeSearchEnhancements() to fix search functionality
     addMicroInteractions();
+    initializeModernAnimations();
+    addFloatingElements();
+    initializeThemeEnhancements();
 });
 
 // Removed conflicting search functionality - search is handled by script.js
 
-// Micro-interactions and enhanced animations
+// Enhanced Micro-interactions and animations
 function addMicroInteractions() {
     // Add ripple effect to clickable elements
     document.addEventListener('click', (e) => {
-        if (e.target.closest('.post-card, .search-result-item')) {
+        if (e.target.closest('.post-card, .search-result-item, .share-btn, .back-button')) {
             createRippleEffect(e);
         }
     });
@@ -28,6 +30,7 @@ function addMicroInteractions() {
         card.addEventListener('mouseenter', (e) => {
             card.style.setProperty('--hover-intensity', '1');
             addGlowEffect(card);
+            addFloatingParticles(card);
         });
         
         card.addEventListener('mouseleave', (e) => {
@@ -36,9 +39,11 @@ function addMicroInteractions() {
         });
     });
     
-    // Add pulse effect to search when empty
+    // Enhanced search interactions (temporarily disabled for debugging)
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
+        console.log('Modern UI: Found search input, adding visual enhancements only');
+        // Only add visual enhancements, don't interfere with search logic
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !searchInput.value.trim()) {
                 searchInput.classList.add('pulse-error');
@@ -47,7 +52,30 @@ function addMicroInteractions() {
                 }, 600);
             }
         });
+        
+        // Add typing animation (visual only) - disabled to avoid conflicts
+        // searchInput.addEventListener('input', (e) => {
+        //     if (e.target.value.length > 0) {
+        //         e.target.classList.add('typing');
+        //     } else {
+        //         e.target.classList.remove('typing');
+        //     }
+        // });
     }
+    
+    // Add smooth scroll to all internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
 }
 
 function createRippleEffect(e) {
@@ -89,6 +117,36 @@ function addGlowEffect(element) {
 
 function removeGlowEffect(element) {
     element.style.boxShadow = '';
+}
+
+// Add floating particles on hover
+function addFloatingParticles(element) {
+    const rect = element.getBoundingClientRect();
+    const particleCount = 3;
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.style.cssText = `
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(45deg, #6366f1, #10b981);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+            left: ${rect.left + Math.random() * rect.width}px;
+            top: ${rect.top + Math.random() * rect.height}px;
+            animation: floatAway 1s ease-out forwards;
+        `;
+        
+        document.body.appendChild(particle);
+        
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+            }
+        }, 1000);
+    }
 }
 
 // Intersection Observer for scroll animations
@@ -267,6 +325,121 @@ function addBackgroundPatterns() {
         <div class="pattern-circle pattern-3"></div>
     `;
     document.body.appendChild(patterns);
+}
+
+// Modern animation enhancements
+function initializeModernAnimations() {
+    // Add staggered animations to cards
+    const cards = document.querySelectorAll('.post-card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('animate-in');
+    });
+    
+    // Add typing effect to titles
+    const titles = document.querySelectorAll('h1, h2');
+    titles.forEach(title => {
+        if (title.textContent.length > 0) {
+            addTypingEffect(title);
+        }
+    });
+}
+
+// Floating elements for visual interest
+function addFloatingElements() {
+    const floatingContainer = document.createElement('div');
+    floatingContainer.className = 'floating-elements';
+    floatingContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+    `;
+    
+    // Create floating particles
+    for (let i = 0; i < 6; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'floating-particle';
+        particle.style.cssText = `
+            position: absolute;
+            width: ${Math.random() * 4 + 2}px;
+            height: ${Math.random() * 4 + 2}px;
+            background: linear-gradient(45deg, #6366f1, #10b981);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float ${Math.random() * 20 + 10}s linear infinite;
+            left: ${Math.random() * 100}%;
+            top: ${Math.random() * 100}%;
+        `;
+        floatingContainer.appendChild(particle);
+    }
+    
+    document.body.appendChild(floatingContainer);
+}
+
+// Theme enhancements
+function initializeThemeEnhancements() {
+    // Add dynamic color shifting
+    const root = document.documentElement;
+    let hue = 0;
+    
+    setInterval(() => {
+        hue = (hue + 0.5) % 360;
+        root.style.setProperty('--dynamic-hue', hue);
+    }, 100);
+    
+    // Add smooth transitions to all elements
+    const style = document.createElement('style');
+    style.textContent = `
+        * {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .animate-in {
+            animation: slideInUp 0.6s ease forwards;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Typing effect for titles
+function addTypingEffect(element) {
+    const text = element.textContent;
+    element.textContent = '';
+    element.style.borderRight = '2px solid #6366f1';
+    
+    let i = 0;
+    const typeWriter = () => {
+        if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+            setTimeout(typeWriter, 100);
+        } else {
+            element.style.borderRight = 'none';
+        }
+    };
+    
+    setTimeout(typeWriter, 500);
 }
 
 // Initialize optional features

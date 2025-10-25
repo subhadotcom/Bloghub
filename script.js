@@ -2,6 +2,8 @@
 const searchInput = document.getElementById('searchInput');
 const searchResults = document.getElementById('searchResults');
 
+// Debug logging removed for production
+
 // Validate DOM elements
 if (!searchInput) {
     console.error('Search input element not found! Make sure element with id="searchInput" exists.');
@@ -223,7 +225,6 @@ function levenshteinDistance(str1, str2) {
 }
 
 function displaySearchResults(results, searchTerm) {
-    
     // Performance optimization: use DocumentFragment for better rendering
     const fragment = document.createDocumentFragment();
     
@@ -370,6 +371,7 @@ function showSearchResults() {
         searchResults.style.display = 'block';
         searchResults.style.visibility = 'visible';
         searchResults.style.opacity = '1';
+        searchResults.style.pointerEvents = 'auto';
     } else {
         console.error('Search results element not found!');
     }
