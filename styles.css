@@ -1995,6 +1995,11 @@ html {
   font-size: 0.95rem;
 }
 
+.contact-item a {
+  color: #ede7e7;
+  text-decoration: none;
+}
+
 .contact-item svg {
   color: #4da6ff;
   flex-shrink: 0;
